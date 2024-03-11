@@ -1,3 +1,5 @@
+// 完成任务，LED闪烁0.25秒，熄灭0.75秒，如此交替循环
+
 module LED_flash
 (
     clk,
@@ -8,14 +10,17 @@ module LED_flash
     input reset_n;
     output reg led;
 
-//  板子上的PL端晶振是50Mhz，要完成每秒翻转led的任务（500ms亮，500ms灭）
-//  则需要计数25_000_000 ,起码需要25个二进制位才能表示?
     reg [24:0] counter;
 
-    always @(posedge clk or negedge reset_n) begin  //posedge clk or negedge reset_n 到来的时候，这个always语句模块才工作?
+    // parameter LED_1 = 12_500_000;
+    // parameter MCNT = 50_000_000;
+    parameter LED_1 = 25_000_000;
+    parameter MCNT = 100_000_000;
+
+    always @(posedge clk or negedge reset_n) begin 
         if(!reset_n)//复位
             counter<=0; //非阻塞赋值
-        else if(counter==24_999_999)
+        else if(counter==MCNT-1)
             counter<=0;
         else
             counter<=counter+1'b1;
@@ -24,8 +29,11 @@ module LED_flash
     always @(posedge clk or negedge reset_n) begin  
         if(!reset_n)
             led<=1'b0;
-        else if(counter==24_999_999)
-            led<=~led;
-            
+        else if(counter==0)
+            led<=1'b1;
+        else if(counter==LED_1)
+            led<=1'b0;
+        // else if(counter==LED_2-1)
+        //     led<=1'b0;
     end
 endmodule
